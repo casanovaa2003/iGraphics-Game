@@ -1,23 +1,40 @@
 #include "iGraphics.h"
 void drawHomePage();
-int homePage = 1;
+void drawMenuPage();
+void drawGamePage();
+int gameState = 0;
 
 
 
 int x = 0;
 int y = 0;
+int screenWidth = 1000;
+int screenHeight = 600;
+
+int buttonWidth = 350;
+int buttonHeight = 70;
+int buttonGap = 20;
+
+int menuStartY;
 
 void iDraw()
 {
 	iClear();
-	if (homePage == 1)
+
+	if (gameState == 0)
 	{
 		drawHomePage();
 	}
-	//iFilledRectangle(x, y, 100, 100);
-	//iSetColor(255, 255, 255);
-
+	else if (gameState == 1)
+	{
+		drawMenuPage();
+	}
+	else if (gameState == 2)
+	{
+		drawGamePage();
+	}
 }
+
 
 void iMouseMove(int mx, int my)
 {
@@ -75,10 +92,64 @@ void fixedUpdate()
 }
 void drawHomePage()
 {
-	iSetColor(128, 128, 128);
-	iFilledRectangle(0, 0, 1000, 600);
-	iShowBMP2(0,0,"image\\homepage.bmp",0);
+	iShowBMP2(0, 0, "image\\homepage.bmp", 0);
+
+	iSetColor(255, 255, 255);
+	//iText(420, 50, "Press ENTER to Continue", GLUT_BITMAP_HELVETICA_18);
 }
+void goToMenu()
+{
+	if (gameState == 0)
+		gameState = 1;
+}
+
+void drawMenuPage()
+{
+	iShowBMP2(0, 0, "image\\menu_bg.bmp", 0);
+
+	int centerX = screenWidth / 2 - buttonWidth / 2;
+
+	// Total height of all buttons block
+	int totalHeight = 5 * buttonHeight + 4 * buttonGap;
+
+	// Start Y so that whole block is vertically centered
+	menuStartY = screenHeight / 2 + totalHeight / 2 - buttonHeight;
+
+	// Draw 5 buttons
+	for (int i = 0; i < 5; i++)
+	{
+		int y = menuStartY - i * (buttonHeight + buttonGap);
+		iShowBMP2(centerX, y, "image\\button.bmp", 0);
+	}
+
+	// Button Text
+	iSetColor(255, 255, 255);
+
+	iText(centerX + 110, menuStartY + 25, "ONE VS ONE", GLUT_BITMAP_HELVETICA_18);
+	iText(centerX + 120, menuStartY - (buttonHeight + buttonGap) + 25, "STORY MODE", GLUT_BITMAP_HELVETICA_18);
+	iText(centerX + 150, menuStartY - 2 * (buttonHeight + buttonGap) + 25, "SHOP", GLUT_BITMAP_HELVETICA_18);
+	iText(centerX + 100, menuStartY - 3 * (buttonHeight + buttonGap) + 25, "PRACTICE MODE", GLUT_BITMAP_HELVETICA_18);
+	iText(centerX + 140, menuStartY - 4 * (buttonHeight + buttonGap) + 25, "ABOUT US", GLUT_BITMAP_HELVETICA_18);
+}
+void drawGamePage()
+{
+	iSetColor(0, 0, 0);
+	iFilledRectangle(0, 0, screenWidth, screenHeight);
+
+	iSetColor(255, 255, 255);
+	iText(450, 300, "GAME STARTED");
+}
+/*void iKeyboard(unsigned char key)
+{
+	if (gameState == 0)
+	{
+		if (key == '\r' || key == '\n')  
+		{
+			gameState = 1;
+		}
+	}
+}*/
+
 
 
 int main()
@@ -94,6 +165,7 @@ int main()
 	// mciSendString("close bgsong", NULL, 0, NULL);
 	// mciSendString("close ggsong", NULL, 0, NULL);
 
+	iSetTimer(4000, goToMenu);
 	iInitialize(1000, 600, "Project Title");
 	iStart();
 	return 0;
